@@ -33,10 +33,12 @@ Product / market intelligence
 ingestion/
   itunes_client.py   # iTunes Search API client
   config.py           # loads search config (term/country/entity) from .env
+  fetch_apps.py       # one-off exploratory script, see "Ingestion" below
 tests/
   test_itunes_client.py
   test_config.py
 .env.example           # template — copy to .env and fill in your own values
+data/raw/               # fetched raw JSON (gitignored, not committed)
 ```
 
 ## Setup
@@ -66,6 +68,7 @@ Set them in `.env` (copied from `.env.example`):
 APP_STORE_SEARCH_TERM=your-company-or-app-name
 APP_STORE_COUNTRY=US
 APP_STORE_ENTITY=your-entity-type   # see Apple's iTunes Search API docs
+APP_STORE_LIMIT=10
 ```
 
 Then load them via `ingestion.config`:
@@ -76,7 +79,9 @@ from ingestion.itunes_client import ITunesSearchClient
 
 config = load_search_config()  # raises RuntimeError if .env isn't set up
 client = ITunesSearchClient()
-data = client.search(term=config.term, entity=config.entity, country=config.country)
+data = client.search(
+    term=config.term, entity=config.entity, country=config.country, limit=config.limit
+)
 ```
 
 ### `ITunesSearchClient.search` parameters
@@ -106,6 +111,21 @@ when present). Other 4xx errors and malformed 200 payloads are not
 retried, since retrying an identical bad request just repeats the same
 result. Configurable via the `max_retries` and `backoff_factor` constructor
 arguments (defaults: 3 retries, 0.5s base backoff).
+
+## Ingestion
+
+`ingestion/fetch_apps.py` is a minimal, one-off script for a first real-data
+experiment — it is not the scheduled pipeline. It reads `term`/`country`/
+`entity`/`limit` from `.env` via `ingestion.config` (nothing hardcoded), calls
+the iTunes Search API once, and saves the raw response to
+`data/raw/<term>_<country>_<entity>.json` (e.g. `data/raw/clean_US_macSoftware.json`
+for the example values in `.env.example`). No pagination, retries, rate-limit
+handling, or BigQuery — just enough to prove the API call and file save work
+end to end.
+
+```bash
+python3 -m ingestion.fetch_apps
+```
 
 ## Testing
 

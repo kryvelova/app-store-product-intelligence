@@ -1,6 +1,9 @@
 # Environment
 .env
 
+# Fetched/generated data
+data/
+
 # Python
 __pycache__/
 *.py[cod]
