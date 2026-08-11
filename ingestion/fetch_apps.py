@@ -10,10 +10,7 @@ Usage:
     python3 -m ingestion.fetch_apps
 """
 
-from __future__ import annotations
-
 import json
-import re
 import sys
 import urllib.error
 import urllib.parse
@@ -47,11 +44,6 @@ def fetch_apps(term: str, country: str, entity: str, limit: int) -> bytes:
         raise RuntimeError(f"Request to iTunes Search API failed: {exc.reason}") from exc
 
 
-def _slugify(value: str) -> str:
-    """Turn a config value into a safe filename fragment."""
-    return re.sub(r"[^A-Za-z0-9]+", "_", value).strip("_")
-
-
 def main() -> None:
     config = load_search_config()
 
@@ -66,7 +58,7 @@ def main() -> None:
     except json.JSONDecodeError as exc:
         raise RuntimeError(f"iTunes Search API returned invalid JSON: {exc}") from exc
 
-    filename = f"{_slugify(config.term)}_{_slugify(config.country)}_{_slugify(config.entity)}.json"
+    filename = f"{config.term}_{config.country}_{config.entity}.json"
     output_path = DATA_DIR / filename
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_bytes(raw_body)

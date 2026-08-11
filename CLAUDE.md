@@ -41,8 +41,8 @@ Product / market intelligence
 - Preserve raw API responses where practical.
 - Every collected record must have a snapshot_date.
 - Keep ingestion separate from dbt transformations.
-- Do not hard-code company name into the data models.
-- Make the pipeline configurable for other companies.
+- Do not hard-code company name or any other names into the data models.
+- Make the pipeline configurable for different companies.
 - Prefer simple, maintainable solutions.
 - Add tests for important transformations.
 - Do not introduce unnecessary infrastructure.
@@ -55,4 +55,6 @@ Before implementing a significant change:
 3. Add tests where appropriate.
 4. Run relevant tests/linting.
 5. Do not modify unrelated files.
+6. Use simple code, don't overengineer it
+7. Write code only when it's needed
 

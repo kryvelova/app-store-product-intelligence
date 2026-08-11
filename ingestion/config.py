@@ -7,8 +7,6 @@ configurable for other companies."). Copy `.env.example` to `.env` and fill
 in your own values; `.env` is gitignored and never committed.
 """
 
-from __future__ import annotations
-
 import os
 from dataclasses import dataclass
 from pathlib import Path
