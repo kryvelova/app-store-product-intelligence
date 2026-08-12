@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # Only the tests in tests/test_stg_apps.py and
+    # tests/test_mart_app_category_engagement.py need this — they build
+    # synthetic data in an isolated schema per test (see tests/conftest.py),
+    # so no real CSV or seeded data is needed here.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: app_store_test
+          POSTGRES_USER: app_store
+          POSTGRES_PASSWORD: app_store
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app_store -d app_store_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # Read by transform/db.py — no .env file needed in CI.
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: app_store_test
+      POSTGRES_USER: app_store
+      POSTGRES_PASSWORD: app_store
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: pytest -q
