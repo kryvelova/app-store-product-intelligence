@@ -1,6 +1,12 @@
 # Environment
 .env
 
+# Fetched/generated data
+data/
+
+# Bulk metadata exports
+metadata-*.csv
+
 # Python
 __pycache__/
 *.py[cod]

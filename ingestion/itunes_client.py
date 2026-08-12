@@ -7,8 +7,6 @@ does not persist data anywhere (no BigQuery, no files) — that is handled by
 downstream ingestion code.
 """
 
-from __future__ import annotations
-
 import time
 from typing import Any, Optional
 
